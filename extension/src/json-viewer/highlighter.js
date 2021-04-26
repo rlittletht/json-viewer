@@ -8,6 +8,9 @@ require('codemirror/addon/search/matchesonscrollbar');
 require('codemirror/addon/search/searchcursor');
 require('codemirror/addon/search/search');
 require('codemirror/mode/javascript/javascript');
+
+var extractInfoFromObject = require('./extractFromJson.js');
+
 var merge = require('./merge');
 var defaults = require('./options/defaults');
 var URL_PATTERN = require('./url-pattern');
@@ -47,10 +50,41 @@ Highlighter.prototype = {
     return document.getElementsByClassName('CodeMirror')[0];
   },
 
-  fold: function() {
+  fold: function(fOnlyLevel2) {
     var skippedRoot = false;
     var firstLine = this.editor.firstLine();
     var lastLine = this.editor.lastLine();
+
+    if (fOnlyLevel2) {
+      var lineCurrent = firstLine;
+
+      while (lineCurrent < lastLine) {
+        if (!skippedRoot) {
+          if (/(\[|\{)/.test(this.editor.getLine(lineCurrent).trim())) skippedRoot = true;
+          lineCurrent++;
+          continue;
+        }
+        var marks = this.editor.findMarks({ line: lineCurrent, ch: 0 }, { line: lastLine + 1, ch: 0 });
+
+        var skipToLine = 0;
+
+        // look for any folded regions, skip them and continue
+        for (var iMark in marks) {
+          var mark = marks[iMark]
+          if (mark.__isFold) {
+            skipToLine = lineCurrent + mark.lines.length - 1;
+            break;
+          }
+        }
+        if (skipToLine != 0) {
+          lineCurrent = skipToLine;
+          continue;
+        }
+        this.editor.foldCode({ line: lineCurrent, ch: 0 }, null, "fold");
+        lineCurrent++;
+      }
+      return;
+    }
 
     for (var line = firstLine; line <= lastLine; line++) {
       if (!skippedRoot) {
@@ -140,9 +174,36 @@ Highlighter.prototype = {
   },
 
   decodeText: function(text) {
+    if (text === "")
+      text = "<empty>";
+
     var div = document.createElement("div");
     div.innerHTML = text;
     return div.firstChild.nodeValue;
+  },
+    
+  getWidgetText: function(from, to) {
+    var prevLine = this.editor.getLine(from.line);
+    var startToken = '{', endToken = '}';
+
+    if (prevLine.lastIndexOf('[') > prevLine.lastIndexOf('{')) {
+      // we are an array item
+      startToken = '[';
+      endToken = ']';
+    }
+
+    var jsonString = startToken + this.editor.getRange(from, to) + endToken;
+    var o = JSON.parse(jsonString);
+
+    if (!o)
+      return "...";
+
+    var extract = extractInfoFromObject(o, this.options.foldSummarizerData, "", true);
+
+    if (extract)
+      return extract;
+
+    return "...";
   },
 
   getEditorOptions: function() {
@@ -156,6 +217,10 @@ Highlighter.prototype = {
       gutters: ["CodeMirror-linenumbers", "CodeMirror-foldgutter"],
       extraKeys: this.getExtraKeysMap()
     }
+
+    obligatory.foldOptions = obligatory.foldOptions || {};
+    obligatory.foldOptions.widget = (from, to) => this.getWidgetText(from, to);
+    obligatory.cursorBlinkRate = 0;
 
     if (this.alwaysRenderAllContent()) {
       obligatory.viewportMargin = Infinity;

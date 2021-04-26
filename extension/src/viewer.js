@@ -1,4 +1,6 @@
 require('./viewer-styles');
+var sweetAlert = require('sweetalert');
+
 var JSONUtils = require('./json-viewer/check-if-json');
 var highlightContent = require('./json-viewer/highlight-content');
 

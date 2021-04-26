@@ -14,16 +14,30 @@ jsl.format = (function () {
         var currentPosition = startingPosition + 1;
         var inString = false;
         var numOpened = 1;
+        var chCurrent = jsonString.charAt(startingPosition);
+        var chOpen, chClose;
+
+        if (chCurrent === '[') {
+          chOpen = '[';
+          chClose = ']';
+        }
+        else if (chCurrent === '{') {
+          chOpen = '{';
+          chClose = '}';
+        } else {
+          return null;
+        }
+
         try{
             while (numOpened > 0 && currentPosition < jsonString.length) {
                 var currentChar = jsonString.charAt(currentPosition)
                 switch (currentChar) {
-                    case '[':
+                    case chOpen:
                         if(!inString){
                             numOpened++;
                         }
                         break;
-                    case ']':
+                    case chClose:
                         if(!inString){
                             numOpened--;
                         }
@@ -34,12 +48,57 @@ jsl.format = (function () {
                 }
                 currentPosition++;
             }
-            return JSON.parse(jsonString.substring(startingPosition,currentPosition)).length;
+            return Object.keys(JSON.parse(jsonString.substring(startingPosition,currentPosition))).length;
         }
         catch(err){
             return null;
         }
     }
+
+    function getSizeOfArrayReverse(jsonString, startingPosition) {
+      var currentPosition = startingPosition - 1;
+      var inString = false;
+      var numOpened = 1;
+      var chCurrent = jsonString.charAt(startingPosition);
+      var chOpen, chClose;
+
+      if (chCurrent === ']') {
+        chOpen = '[';
+        chClose = ']';
+      }
+      else if (chCurrent === '}') {
+        chOpen = '{';
+        chClose = '}';
+      } else {
+        return null;
+      }
+      try {
+        while (numOpened > 0 && currentPosition >= 0) {
+          var currentChar = jsonString.charAt(currentPosition);
+          switch (currentChar) {
+            case chOpen:
+              if (!inString) {
+                numOpened--;
+              }
+              break;
+            case chClose:
+              if (!inString) {
+                numOpened++;
+              }
+              break;
+            case '"':
+              inString = !inString;
+              break;
+          }
+          currentPosition--;
+        }
+        return Object.keys(JSON.parse(jsonString.substring(currentPosition + 1, startingPosition + 1))).length;
+      }
+      catch (err) {
+        return null;
+      }
+    }
+
     function formatJson(json, options) {
         options = options || {};
         var tabSize = options.tabSize || 2;
@@ -55,45 +114,66 @@ jsl.format = (function () {
             newJson     = "",
             indentLevel = 0,
             inString    = false,
-            currentChar = null;
+            currentChar = null,
+            fLastWasDelim = true;
+    
         for (i = 0, il = json.length; i < il; i += 1) {
             currentChar = json.charAt(i);
+            var arraySize = 0;
 
             switch (currentChar) {
             case '{':
             case '[':
                 if (!inString) {
-                    if (indentCStyle) newJson += "\n" + repeat(tab, indentLevel);
+                    arraySize = getSizeOfArray(json, i);
+                    if (indentCStyle
+                        && arraySize !== null
+                        && arraySize > 0
+                        && !fLastWasDelim) {
+                        newJson += "\n" + repeat(tab, indentLevel);
+                    }
                     if(currentChar === "["){
                         if(showArraySize){
-                            var arraySize = getSizeOfArray(json,i);
                             if(arraySize !== null){
                                 newJson += "Array[" + arraySize + "]";
                             }
                         }
                     }
                     newJson += currentChar;
-
-                    newJson +=  "\n" + repeat(tab, indentLevel + 1);
-                    indentLevel += 1;
+                  
+                    if(arraySize !== null && arraySize > 0){
+                        newJson += "\n" + repeat(tab, indentLevel + 1);
+                        indentLevel += 1;
+                    }
+                    fLastWasDelim = true;
                 } else {
                     newJson += currentChar;
+                    fLastWasDelim = false;
                 }
                 break;
             case '}':
             case ']':
                 if (!inString) {
-                    indentLevel -= 1;
-                    newJson += "\n" + repeat(tab, indentLevel) + currentChar;
+                    arraySize = getSizeOfArrayReverse(json, i);
+                    
+                    if (arraySize !== null && arraySize > 0) {
+                        indentLevel -= 1;
+                        newJson += "\n" + repeat(tab, indentLevel);
+                    }
+                    newJson += currentChar;
+                    fLastWasDelim = true;
                 } else {
                     newJson += currentChar;
+                    fLastWasDelim = false;
                 }
                 break;
             case ',':
                 if (!inString) {
                     newJson += ",\n" + repeat(tab, indentLevel);
+                    fLastWasDelim = true;
                 } else {
                     newJson += currentChar;
+                    fLastWasDelim = false;
                 }
                 break;
             case ':':
@@ -102,12 +182,14 @@ jsl.format = (function () {
                 } else {
                     newJson += currentChar;
                 }
+                fLastWasDelim = false;
                 break;
             case ' ':
             case "\n":
             case "\t":
                 if (inString) {
                     newJson += currentChar;
+                    fLastWasDelim = false;
                 }
                 break;
             case '"':
@@ -118,9 +200,11 @@ jsl.format = (function () {
                     inString = !inString;
                 }
                 newJson += currentChar;
+                fLastWasDelim = false;
                 break;
             default:
                 newJson += currentChar;
+                fLastWasDelim = false;
                 break;
             }
         }

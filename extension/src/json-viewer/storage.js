@@ -19,6 +19,8 @@ module.exports = {
     options.addons = merge({}, defaults.addons, options.addons)
     options.structure = options.structure ? JSON.parse(options.structure) : defaults.structure;
     options.style = options.style && options.style.length > 0 ? options.style : defaults.style;
+    options.foldSummarizerData =
+        options.foldSummarizerData ? JSON.parse(options.foldSummarizerData) : defaults.foldSummarizerData;
     return options;
   },
 

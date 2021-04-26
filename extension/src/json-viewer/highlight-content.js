@@ -96,14 +96,13 @@ function highlightContent(pre, outsideViewer, ignoreLimit) {
         // "awaysFold" was a typo but to avoid any problems I'll keep it
         // a while
         if (options.addons.alwaysFold || options.addons.awaysFold) {
-          highlighter.fold();
+          highlighter.fold(!!options.addons.alwaysFoldOnlyTopLevel);
         }
 
         exposeJson(value.jsonExtracted, outsideViewer);
         renderExtras(pre, options, highlighter);
 
       });
-
   }).catch(function(e) {
     pre.hidden = false;
     if (process.env.NODE_ENV === 'development') {
