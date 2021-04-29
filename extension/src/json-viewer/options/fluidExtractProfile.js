@@ -8,6 +8,12 @@ module.exports =
     //            label: "join",
     //        },
     {
+      "keyToMatch": "sequenceNumber",
+      "keysToExtract": ["sequenceNumber"],
+      "extractValues": true,
+      "continueAfterMatch": true
+    },
+    {
         keyToMatch: "contents",
         keyToRecurse: "contents",
     },

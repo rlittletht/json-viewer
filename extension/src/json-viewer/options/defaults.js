@@ -31,6 +31,12 @@ module.exports = {
     "  font-family: monaco, Consolas, Menlo, Courier, monospace;",
     "  font-size: 16px;",
     "  line-height: 1.5em;",
-    "}"
+    "}",
+    ".CodeMirror-foldmarker {",
+    "  text-shadow: none;",
+    "  color: #CCC;",
+    "  font-style: italic;",
+    "}",
+
   ].join('\n')
 }
