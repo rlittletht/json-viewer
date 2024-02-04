@@ -5,15 +5,21 @@ var OLD_NAMESPACE = "options";
 var NAMESPACE = "v2.options";
 
 module.exports = {
-  save: function(obj) {
-    localStorage.setItem(NAMESPACE, JSON.stringify(obj));
+  save: async function(obj) {
+        await chrome.storage.local.set({ [NAMESPACE]: obj });
+        var set1 = await chrome.storage.local.get([NAMESPACE]);
+        console.log("set1: " + JSON.stringify(set1));
+        set = await chrome.storage.local.get(NAMESPACE);
+        console.log("set1: " + JSON.stringify(set1));
   },
 
-  load: function() {
-    var optionsStr = localStorage.getItem(NAMESPACE);
-    optionsStr = this.restoreOldOptions(optionsStr);
+  load: async function() {
+      var resp = await chrome.storage.local.get([NAMESPACE]);
 
-    options = optionsStr ? JSON.parse(optionsStr) : {};
+      var options = resp[NAMESPACE] || {};
+
+//          optionsStr = "";
+//    options = optionsStr ? JSON.parse(optionsStr) : {};
     options.theme = options.theme || defaults.theme;
     options.addons = options.addons ? JSON.parse(options.addons) : {};
     options.addons = merge({}, defaults.addons, options.addons)
@@ -22,44 +28,5 @@ module.exports = {
     options.foldSummarizerData =
         options.foldSummarizerData ? JSON.parse(options.foldSummarizerData) : defaults.foldSummarizerData;
     return options;
-  },
-
-  restoreOldOptions: function(optionsStr) {
-    var oldOptions = localStorage.getItem(OLD_NAMESPACE);
-    var options = null;
-
-    if (optionsStr === null && oldOptions !== null) {
-      try {
-        oldOptions = JSON.parse(oldOptions);
-        if(!oldOptions || typeof oldOptions !== "object") oldOptions = {};
-
-        options = {};
-        options.theme = oldOptions.theme;
-        options.addons = {
-          prependHeader: JSON.parse(oldOptions.prependHeader || defaults.addons.prependHeader),
-          maxJsonSize: parseInt(oldOptions.maxJsonSize || defaults.addons.maxJsonSize, 10)
-        }
-
-        // Update to at least the new max value
-        if (options.addons.maxJsonSize < defaults.addons.maxJsonSize) {
-          options.addons.maxJsonSize = defaults.addons.maxJsonSize;
-        }
-
-        options.addons = JSON.stringify(options.addons);
-        options.structure = JSON.stringify(defaults.structure);
-        options.style = defaults.style;
-        this.save(options);
-
-        optionsStr = JSON.stringify(options);
-
-      } catch(e) {
-        console.error('[JSONViewer] error: ' + e.message, e);
-
-      } finally {
-        localStorage.removeItem(OLD_NAMESPACE);
-      }
-    }
-
-    return optionsStr;
   }
 }

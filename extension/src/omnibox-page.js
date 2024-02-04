@@ -3,6 +3,7 @@ var highlightContent = require('./json-viewer/highlight-content');
 var loadScratchPadEditor = require('./json-viewer/scratch-pad/load-editor');
 
 function onLoad() {
+
   var pre = document.getElementsByTagName("pre")[0];
   var query = window.location.search.substring(1);
 

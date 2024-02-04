@@ -8,6 +8,7 @@ var getOptions = require('./viewer/get-options');
 var loadRequiredCss = require('./viewer/load-required-css');
 
 function oversizedJSON(pre, options, outsideViewer) {
+
   var jsonSize = pre.textContent.length;
   var accepted = options.addons.maxJsonSize;
 
@@ -62,7 +63,9 @@ function prependHeader(options, outsideViewer, jsonText) {
   return jsonText;
 }
 
-function highlightContent(pre, outsideViewer, ignoreLimit) {
+function highlightContent(pre, outsideViewer, ignoreLimit)
+{
+    debugger;
   getOptions().then(function(options) {
     if (!ignoreLimit && oversizedJSON(pre, options, outsideViewer)) {
       return pre.hidden = false;

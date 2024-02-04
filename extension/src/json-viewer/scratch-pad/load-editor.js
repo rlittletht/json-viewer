@@ -8,7 +8,9 @@ var jsonFormater = require('../jsl-format');
 var JSONUtils = require('../check-if-json');
 var exposeJson = require('../viewer/expose-json');
 
-function loadEditor(pre) {
+function loadEditor(pre)
+{
+    debugger;
   getOptions().then(function(options) {
     return loadRequiredCss(options).then(function() {
       var scratchPadOptions = merge({}, options);

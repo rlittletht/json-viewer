@@ -7,44 +7,60 @@ function allTextNodes(nodes) {
   })
 }
 
-function getPreWithSource() {
-  var childNodes = document.body.childNodes;
+function getPreWithSource()
+{
+    var childNodes = document.body.childNodes;
 
-  if (childNodes.length === 0) {
-    return null
-  }
-
-  if (childNodes.length > 1 && allTextNodes(childNodes)) {
-    if (process.env.NODE_ENV === 'development') {
-      console.debug("[JSONViewer] Loaded from a multiple text nodes, normalizing");
+    if (childNodes.length === 0)
+    {
+        return null
     }
 
-    document.body.normalize() // concatenates adjacent text nodes
-  }
+    if (childNodes.length > 1 && allTextNodes(childNodes))
+    {
+        if (process.env.NODE_ENV === 'development')
+        {
+            console.debug("[JSONViewer] Loaded from a multiple text nodes, normalizing");
+        }
 
-  var childNode = childNodes[0];
-  var nodeName = childNode.nodeName
-  var textContent = childNode.textContent
-
-  if (nodeName === "PRE") {
-    return childNode;
-  }
-
-  // if Content-Type is text/html
-  if (nodeName === "#text" && textContent.trim().length > 0) {
-    if (process.env.NODE_ENV === 'development') {
-      console.debug("[JSONViewer] Loaded from a text node, this might have returned content-type: text/html");
+        document.body.normalize() // concatenates adjacent text nodes
     }
+
+    var childNode = childNodes[0];
+    var nodeName = childNode.nodeName
+    var textContent = childNode.textContent
+
+    if (nodeName === "PRE")
+    {
+        return childNode;
+    }
+
+    var canFixup = false;
+    // if Content-Type is text/html
+    if (nodeName === "DIV" && childNode.hidden == true && childNodes.length > 1 && childNodes[1].nodeName === "BUTTON" && textContent.trim().length > 0)
+    {
+        canFixup = true;
+    }
+
+    if (nodeName === "#text" && textContent.trim().length > 0)
+    {
+        if (process.env.NODE_ENV === 'development')
+        {
+            console.debug("[JSONViewer] Loaded from a text node, this might have returned content-type: text/html");
+        }
+        canFixup = true;
+    }
+
+    if (!canFixup)
+        return null;
 
     var pre = document.createElement("pre");
     pre.textContent = textContent;
-    document.body.removeChild(childNode);
+    document.body.replaceWith(document.createElement("body"));
+//    document.body.removeChild(childNode);
     document.body.appendChild(pre);
     bodyModified = true;
     return pre;
-  }
-
-  return null
 }
 
 function restoreNonJSONBody() {

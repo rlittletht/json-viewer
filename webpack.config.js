@@ -1,10 +1,11 @@
 var path = require("path");
 var fs = require('fs-extra');
 var webpack = require("webpack");
-var Clean = require("clean-webpack-plugin");
+const { CleanWebpackPlugin } = require("clean-webpack-plugin");
 var BuildPaths = require("./lib/build-paths");
 var BuildExtension = require("./lib/build-extension-webpack-plugin");
-var ExtractTextPlugin = require("extract-text-webpack-plugin");
+//var ExtractTextPlugin = require("extract-text-webpack-plugin");
+var MiniCssExtractPlugin = require("mini-css-extract-plugin");
 
 var manifest = fs.readJSONSync(path.join(BuildPaths.SRC_ROOT, 'manifest.json'));
 var version = manifest.version;
@@ -14,7 +15,8 @@ var entries = {
   "viewer-alert": ["./extension/styles/viewer-alert.scss"],
   options: ["./extension/src/options.js"],
   backend: ["./extension/src/backend.js"],
-  omnibox: ["./extension/src/omnibox.js"],
+    omnibox: ["./extension/src/omnibox.js"],
+  service_worker: ["./extension/src/service_worker.js"],
   "omnibox-page": ["./extension/src/omnibox-page.js"]
 };
 
@@ -46,31 +48,43 @@ console.log(entries);
 console.log("\n");
 
 var manifest = {
-  debug: false,
+  //debug: false,
   context: __dirname,
   entry: entries,
-  themes: themes,
+//  themes: themes,
   output: {
     path: path.join(__dirname, "build/json_viewer/assets"),
     filename: "[name].js"
   },
   module: {
-    loaders: [
-      {test: /\.(css|scss)$/, loader: ExtractTextPlugin.extract("style-loader", "css-loader!sass-loader")}
+//        loaders: [],
+      rules: [
+          {
+              test: /\.(sa|sc|c)ss$/,
+              use: [
+                  MiniCssExtractPlugin.loader,
+                  "css-loader",
+                  "postcss-loader",
+                  "sass-loader"
+              ]
+          }
     ]
   },
-  resolve: {
-    extensions: ['', '.js', '.css', '.scss'],
-    root: path.resolve(__dirname, './extension'),
+    resolve: {
+        extensions: ['', '.js', '.css', '.scss'],
+        alias: {
+            root: path.resolve(__dirname, './extension')
+        }
   },
   externals: [
     {
       "chrome-framework": "chrome"
     }
-  ],
+    ],
+  devtool: 'cheap-module-source-map',
   plugins: [
-    new Clean(["build"]),
-    new ExtractTextPlugin("[name].css", {allChunks: true}),
+    new CleanWebpackPlugin(),
+      new MiniCssExtractPlugin({ filename: "[name].css", chunkFilename: "[id].css" }),
     new webpack.DefinePlugin({
       "process.env": {
         NODE_ENV: JSON.stringify(process.env.NODE_ENV || 'development'),
@@ -78,7 +92,7 @@ var manifest = {
         THEMES: JSON.stringify(themes)
       }
     }),
-    new BuildExtension()
+    new BuildExtension(themes)
   ]
 };
 

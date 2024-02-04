@@ -35,9 +35,9 @@ function renderVersion() {
   versionLink.href = "https://github.com/tulios/json-viewer/tree/" + version;
 }
 
-function onLoaded() {
-  var currentOptions = Storage.load();
-
+async function onLoaded() {
+  var currentOptions = await Storage.load();
+    console.log("currentOptions: " + currentOptions);
   renderVersion();
   renderThemeList(CodeMirror, currentOptions.theme);
   var addonsEditor = renderAddons(CodeMirror, currentOptions.addons);
