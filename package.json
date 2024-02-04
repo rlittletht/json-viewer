@@ -1,10 +1,10 @@
 {
-    "name": "json_viewer",
-    "description": "The most beautiful and customizable JSON/JSONP highlighter that your eyes have ever seen. Open source at https://github.com/tulios/json-viewer",
-    "author": "Tulio Ornelas <ornelas.tulio@gmail.com>",
-    "license": "MIT",
-    "repository": "https://github.com/tulios/json-viewer",
-    "private": true,
+  "name": "json_viewer",
+  "description": "tulios/json-viewer extended with fold summaries. Sources at https://github.com/rlittletht/json-viewer",
+  "author": "rlittle@thetasoft.com",
+  "license": "MIT",
+  "repository": "https://github.com/rlittletht/json-viewer",
+  "private": true,
   "dependencies": {
     "webpack": "5.90.1",
     "css-loader": "6.10.0",
@@ -43,8 +43,8 @@
     "release": "node  --inspect-brk --stack-size=10000 ./lib/release-script",
     "apreinstall": "npx npm-force-resolutions"
   },
-    "resolutions": {
-        "graceful-fs": "^4.2.4"
-    },
-    "devDependencies": {}
+  "resolutions": {
+    "graceful-fs": "^4.2.4"
+  },
+  "devDependencies": {}
 }
