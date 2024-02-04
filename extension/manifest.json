@@ -3,7 +3,7 @@
   "version": "1.0.1",
   "manifest_version": 3,
   "author": "Robert Little",
-  "description": "Extended from tulios/json-viewer",
+  "description": "tulios/json-viewer extended with fold summaries",
   "homepage_url": "https://github.com/rlittletht/json-viewer",
   "icons": {
     "128": "icons/128.png",

@@ -74,7 +74,7 @@ function extractInfoForKeys(o, keysToExtract, extractLabel, extractValues)
 //
 //  continueAfterMatch - if present & true, we will continue trying to match after this match. otherwise we stop
 
-function extractInfoFromObject(o, extractInfos, sExtractSoFar, fMustMatch)
+function extractInfoFromObjectInner(o, extractInfos, sExtractSoFar, fMustMatch, fSummarizingArray)
 {
     var sInfo = sExtractSoFar;
 
@@ -83,6 +83,9 @@ function extractInfoFromObject(o, extractInfos, sExtractSoFar, fMustMatch)
         var extractInfo = extractInfos[iExtract];
 
         if (o === undefined || o == null)
+            continue;
+
+        if (extractInfo.dontMatchWhenSummarizing !== undefined && extractInfo.dontMatchWhenSummarizing === true && fSummarizingArray === true)
             continue;
 
         if (extractInfo.keyToMatch !== undefined && o[extractInfo.keyToMatch] === undefined)
@@ -104,7 +107,7 @@ function extractInfoFromObject(o, extractInfos, sExtractSoFar, fMustMatch)
             if (extractInfo.recurseDefinitions !== undefined)
                 extractInfosToRecurse = extractInfo.recurseDefinitions;
 
-            sInfo = extractInfoFromObject(o[extractInfo.keyToRecurse], extractInfosToRecurse, sInfo, false);
+            sInfo = extractInfoFromObject(o[extractInfo.keyToRecurse], extractInfosToRecurse, sInfo, false, fSummarizingArray);
         }
 
         if (extractInfo.continueAfterMatch === undefined)
@@ -117,6 +120,19 @@ function extractInfoFromObject(o, extractInfos, sExtractSoFar, fMustMatch)
         return null;
 
     return sInfo;
+}
+
+function extractInfoFromObject(o, extractInfos, sExtractSoFar, fMustMatch, fSummarizingArray)
+{
+    if (Array.isArray(o))
+    {
+        for (var i in o)
+        {
+            sExtractSoFar = extractInfoFromObjectInner(o[i], extractInfos, sExtractSoFar, fMustMatch, true);
+        }
+        return sExtractSoFar;
+    }
+    return extractInfoFromObjectInner(o, extractInfos, sExtractSoFar, fMustMatch, fSummarizingArray);
 }
 
 module.exports = extractInfoFromObject;

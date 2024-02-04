@@ -81,7 +81,7 @@ var manifest = {
       "chrome-framework": "chrome"
     }
     ],
-  devtool: 'cheap-module-source-map',
+  devtool: 'inline-source-map',
   plugins: [
     new CleanWebpackPlugin(),
       new MiniCssExtractPlugin({ filename: "[name].css", chunkFilename: "[id].css" }),

@@ -10,28 +10,32 @@ var exposeJson = require('../viewer/expose-json');
 
 function loadEditor(pre)
 {
-    debugger;
-  getOptions().then(function(options) {
-    return loadRequiredCss(options).then(function() {
-      var scratchPadOptions = merge({}, options);
-      scratchPadOptions.structure.readOnly = false;
+    getOptions().then(
+        function(options)
+        {
+            return loadRequiredCss(options).then(
+                function()
+                {
+                    var scratchPadOptions = merge({}, options);
+                    scratchPadOptions.structure.readOnly = false;
 
-      var highlighter = new Highlighter("", scratchPadOptions);
-      highlighter.highlight();
+                    var highlighter = new Highlighter("", scratchPadOptions);
+                    highlighter.highlight();
 
-      renderExtras(pre, options, highlighter);
-      renderFormatButton(function() {
-        var text = highlighter.editor.getValue();
-        highlighter.editor.setValue(jsonFormater(text));
-        if (JSONUtils.isJSON(text)) {
-          exposeJson(text, true);
-        }
-      });
-
-    });
-  }).catch(function(e) {
-    console.error('[JSONViewer] error: ' + e.message, e);
-  });
+                    renderExtras(pre, options, highlighter);
+                    renderFormatButton(
+                        function()
+                        {
+                            var text = highlighter.editor.getValue();
+                            highlighter.editor.setValue(jsonFormater(text));
+                            if (JSONUtils.isJSON(text)) exposeJson(text, true);
+                        });
+                });
+        }).catch(
+        function(e)
+        {
+            console.error('[JSONViewer] error: ' + e.message, e);
+        });
 }
 
 module.exports = loadEditor;
