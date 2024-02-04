@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html>
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
@@ -29,35 +29,50 @@
           <h2>Add-ons</h2>
           <span class="hint">Edit this code</span><br/>
           <div class="explain">
-            <ul>
-              <li>
-                <strong>"prependHeader"</strong> - <span class="hint">Comment header with URL and timestamp (boolean). Default true</span>
-              </li>
-              <li>
-                <strong>"maxJsonSize"</strong> - <span class="hint">value in kbytes (integer). Default 400</span>
-              </li>
-              <li>
-                <strong>"alwaysFold"</strong> - <span class="hint">Fold from the second level. A button to unfold all will appear if the value is true (boolean). Default false</span>
-              </li>
-              <li>
-                <strong>"alwaysRenderAllContent"</strong> - <span class="hint">Disables the custom search and renders all content. Be aware that with this option <span class="underline">large files</span> will have a <span class="underline">significant performance reduction</span> (boolean). Default false</span>
-              </li>
-              <li>
-                <strong>"sortKeys"</strong> - <span class="hint">Sort objects by key (boolean). Default false</span>
-              </li>
-              <li>
-                <strong>"clickableUrls"</strong> - <span class="hint">Make URLs clickable (boolean). Default true</span>
-              </li>
-              <li>
-                <strong>"wrapLinkWithAnchorTag"</strong> - <span class="hint">Add URLs as anchor tag (boolean). Default false</span>
-              </li>
-              <li>
-                <strong>"openLinksInNewWindow"</strong> - <span class="hint">Open URLs in the same window/tab (boolean). Default true</span>
-              </li>
-              <li>
-                <strong>"autoHighlight"</strong> - <span class="hint">Highlights the JSON from the beginning. When set to false it still possible to highlight the JSON from the raw page (boolean). Default true</span>
-              </li>
-            </ul>
+              <ul>
+                  <li>
+                      <strong>"autoFoldLevels"</strong> - <span class="hint">How many levels to automatically fold. Default is 1.</span>
+                  </li>
+                  <li>
+                      <strong>"prependHeader"</strong> - <span class="hint">Comment header with URL and timestamp (boolean). Default true</span>
+                  </li>
+                  <li>
+                      <strong>"maxJsonSize"</strong> - <span class="hint">value in kbytes (integer). Default 400</span>
+                  </li>
+                  <li>
+                      <strong>"alwaysFold"</strong> - <span class="hint">Fold from the second level. A button to unfold all will appear if the value is true (boolean). Default false</span>
+                  </li>
+                  <li>
+                      <strong>"alwaysFoldOnlyTopLevel"</strong> - <span class="hint">Fold the second level only, leaving lower levels unfolded. A button to unfold all will appear if the value is true (boolean). Default false</span>
+                  </li>
+                  <li>
+                      <strong>"prefoldKeys"</strong> - <span class="hint">List of keys to prefold. Type is {"key": &lt;keyToFold&gt;, "autoFoldUntil": &lt;count&gt;} Level count is the number of levels to automatically fold.</span>
+                  </li>
+                  <li>
+                      <strong>"alwaysRenderAllContent"</strong> - <span class="hint">Disables the custom search and renders all content. Be aware that with this option <span class="underline">large files</span> will have a <span class="underline">significant performance reduction</span> (boolean). Default false</span>
+                  </li>
+                  <li>
+                      <strong>"sortKeys"</strong> - <span class="hint">Sort objects by key (boolean). Default false</span>
+                  </li>
+                  <li>
+                      <strong>"clickableUrls"</strong> - <span class="hint">Make URLs clickable (boolean). Default true</span>
+                  </li>
+                  <li>
+                      <strong>"wrapLinkWithAnchorTag"</strong> - <span class="hint">Add URLs as anchor tag (boolean). Default false</span>
+                  </li>
+                  <li>
+                      <strong>"openLinksInNewWindow"</strong> - <span class="hint">Open URLs in the same window/tab (boolean). Default true</span>
+                  </li>
+                  <li>
+                      <strong>"autoHighlight"</strong> - <span class="hint">Highlights the JSON from the beginning. When set to false it still possible to highlight the JSON from the raw page (boolean). Default true</span>
+                  </li>
+                  <li>
+                      <strong>"parseJsonStrings"</strong> - <span class="hint">Finds string values that are JSON strings and parses them into the object as well.</span>
+                  </li>
+                  <li>
+                      <strong>"parseJsonStringDepth"</strong> - <span class="hint">When parsing embedded JSON string values, this determines how deep to go. Larger values require additional traversals of the data. Once no JSON strings are found, parsing stops. </span>
+                  </li>
+              </ul>
           </div>
         </header>
 
@@ -94,13 +109,41 @@
         <textarea id="style" name="style" style="display: none;">
         </textarea>
 
-        <div class="action-bar">
-          <div class="container">
-            <a class="version" target="_blank"></a>
-            <button id="reset">Reset to defaults</button>
-            <button id="save">Save</button>
+        <header>
+          <h2>JSON Fold Summarizer</h2>
+          <span class="hint">Edit this code</span><br/>
+          <span class="hint">This is a json object defining how to summarize folded JSON trees</span>
+          <div class="explain">
+            <pre>
+                [ // each item is checked for a match against the current json object (in order of definitions below). All of these are optional
+                  {
+                    keyToMatch: ...                        // object[key] must exist else continue
+                    valueToMatch: ...                      // object[key] must be valueToMatch else continue
+                    label: "..."                           // append label to the summary
+                    keyToRecurse: "..."                    // recursively evaluate object[keyToRecurse]
+                    recurseDefinitions: [...]              // use this definition as the fold summarizer for this recurse
+                    keysToExtract: [key1, ...]             // extract the keys for object[key1], object[key2], ...
+                    extractValues: true|false              // if true, then extract the values for object[key], ...
+                    extractLabel: ""                       // label to prepend before extracted keys/values
+                    continueAfterMatch: true|false         // if true, continue evaluating for more matches
+                    dontMatchWhenSummarizing: true|false   // if true, don't evaluate this rule if we are summarizing a folded array
+                  }
+                ]
+            </pre>
           </div>
-        </div>
+        </header>
+
+        <textarea id="foldSummarizerData" name="foldSummarizerData" style="display: none;">
+        </textarea>
+
+          <div class="action-bar">
+              <div class="container">
+                  <a class="version" target="_blank"></a>
+                  <button id="reset">Reset to defaults</button>
+                  <button id="save">Save</button>
+              </div>
+          </div>
+          <div style="height:1in">&nbsp;</div>
       </form>
 
     </div>

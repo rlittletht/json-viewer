@@ -1,6 +1,6 @@
-var Promise = require('promise');
 var jsonFormater = require('./jsl-format');
 var extractJSON = require('./extract-json');
+var unwrapQuotedJsonInPlace = require('./unwrapQuotedJson.js');
 
 var TOKEN = (Math.random() + 1).toString(36).slice(2, 7);
 var WRAP_START = "<wrap_" + TOKEN + ">";
@@ -24,6 +24,27 @@ function contentExtractor(pre, options) {
       var wrappedText = wrapNumbers(jsonExtracted);
 
       var jsonParsed = JSON.parse(wrappedText);
+
+      if (options.addons.parseJsonStrings)
+      {
+          var foundString = Object(false);
+          var results;
+
+          var cRecurseRemaining = options.addons.parseJsonStringsDepth;
+
+          if (!cRecurseRemaining || cRecurseRemaining < 0 || cRecurseRemaining > 1000)
+              cRecurseRemaining = 1000;
+
+          while (cRecurseRemaining > 0)
+          {
+              results = { fFoundJson: false };
+              jsonParsed = unwrapQuotedJsonInPlace(jsonParsed, results);
+              if (!results.fFoundJson)
+                  break;
+              cRecurseRemaining--;
+          }
+      }
+
       if (options.addons.sortKeys) jsonParsed = sortByKeys(jsonParsed);
 
       // Validate and decode json

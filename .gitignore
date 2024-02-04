@@ -1,5 +1,10 @@
 .DS_Store
+_Resharper*
+*.swp
+Folder.DotSettings.user
 build/*
 pkg/*
 node_modules/*
 *.log
+*/.vs/*
+.vs/*

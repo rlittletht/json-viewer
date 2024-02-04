@@ -14,48 +14,56 @@ var renderThemeList = require('./json-viewer/options/render-theme-list');
 var renderAddons = require('./json-viewer/options/render-addons');
 var renderStructure = require('./json-viewer/options/render-structure');
 var renderStyle = require('./json-viewer/options/render-style');
+var renderSummarizerData = require('./json-viewer/options/render-summarizerData');
 var bindSaveButton = require('./json-viewer/options/bind-save-button');
 var bindResetButton = require('./json-viewer/options/bind-reset-button');
 
-function isValidJSON(pseudoJSON) {
-  try {
-    JSON.parse(pseudoJSON);
-    return true;
-
-  } catch(e) {
-    return false;
-  }
-}
-
-function renderVersion() {
-  var version = process.env.VERSION;
-  var versionLink = document.getElementsByClassName('version')[0];
-  versionLink.innerHTML = version;
-  versionLink.href = "https://github.com/tulios/json-viewer/tree/" + version;
-}
-
-function onLoaded() {
-  var currentOptions = Storage.load();
-
-  renderVersion();
-  renderThemeList(CodeMirror, currentOptions.theme);
-  var addonsEditor = renderAddons(CodeMirror, currentOptions.addons);
-  var structureEditor = renderStructure(CodeMirror, currentOptions.structure);
-  var styleEditor = renderStyle(CodeMirror, currentOptions.style);
-
-  bindResetButton();
-  bindSaveButton([addonsEditor, structureEditor, styleEditor], function(options) {
-    if (!isValidJSON(options.addons)) {
-      sweetAlert("Ops!", "\"Add-ons\" isn't a valid JSON", "error");
-
-    } else if (!isValidJSON(options.structure)) {
-      sweetAlert("Ops!", "\"Structure\" isn't a valid JSON", "error");
-
-    } else {
-      Storage.save(options);
-      sweetAlert("Success", "Options saved!", "success");
+function isValidJSON(pseudoJSON)
+{
+    try
+    {
+        JSON.parse(pseudoJSON);
+        return true;
     }
-  });
+    catch (e)
+    {
+        return false;
+    }
+}
+
+function renderVersion()
+{
+    var version = process.env.VERSION;
+    var versionLink = document.getElementsByClassName('version')[0];
+    versionLink.innerHTML = version;
+    versionLink.href = "https://github.com/rlittletht/json-viewer";
+}
+
+async function onLoaded()
+{
+    var currentOptions = await Storage.load();
+    console.log("currentOptions: " + currentOptions);
+    renderVersion();
+    renderThemeList(CodeMirror, currentOptions.theme);
+    var addonsEditor = renderAddons(CodeMirror, currentOptions.addons);
+    var structureEditor = renderStructure(CodeMirror, currentOptions.structure);
+    var styleEditor = renderStyle(CodeMirror, currentOptions.style);
+    var summarizerEditor = renderSummarizerData(CodeMirror, currentOptions.foldSummarizerData);
+
+    bindResetButton();
+    bindSaveButton(
+        [addonsEditor, structureEditor, styleEditor, summarizerEditor],
+        function(options)
+        {
+            if (!isValidJSON(options.addons)) sweetAlert("Ops!", "\"Add-ons\" isn't a valid JSON", "error");
+            else if (!isValidJSON(options.structure)) sweetAlert("Ops!", "\"Structure\" isn't a valid JSON", "error");
+            else if (!isValidJSON(options.foldSummarizerData)) sweetAlert("Ops!", "\"SummarizerData\" isn't a valid JSON", "error");
+            else
+            {
+                Storage.save(options);
+                sweetAlert("Success", "Options saved!", "success");
+            }
+        });
 }
 
 document.addEventListener("DOMContentLoaded", onLoaded, false);

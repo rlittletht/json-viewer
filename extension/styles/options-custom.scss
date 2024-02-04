@@ -85,9 +85,14 @@ header {
 
 #style + .CodeMirror {
   height: 450px;
-  margin-bottom: 100px;
 }
 
+#foldSummarizerData + .CodeMirror {
+    height: 650px;
+    margin-bottom: 100px;
+}
+
+#foldSummarizer + .CodeMirror,
 #addons + .CodeMirror
 #structure + .CodeMirror,
 #style + .CodeMirror {

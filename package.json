@@ -1,28 +1,50 @@
 {
-  "name": "json_viewer",
-  "description": "The most beautiful and customizable JSON/JSONP highlighter that your eyes have ever seen. Open source at https://github.com/tulios/json-viewer",
-  "author": "Tulio Ornelas <ornelas.tulio@gmail.com>",
-  "license": "MIT",
-  "repository": "https://github.com/tulios/json-viewer",
-  "private": true,
+    "name": "json_viewer",
+    "description": "The most beautiful and customizable JSON/JSONP highlighter that your eyes have ever seen. Open source at https://github.com/tulios/json-viewer",
+    "author": "Tulio Ornelas <ornelas.tulio@gmail.com>",
+    "license": "MIT",
+    "repository": "https://github.com/tulios/json-viewer",
+    "private": true,
   "dependencies": {
+    "webpack": "5.90.1",
+    "css-loader": "6.10.0",
+    "node-sass": "9.0.0",
+    "webpack-cli": "5.1.4",
+    "fs-extra": "11.2.0",
+    "clean-webpack-plugin": "4.0.0",
+    "archiver": "6.0.1",
+    "mini-css-extract-plugin": "2.8.0",
+    "postcss-loader": "8.1.0",
+    "sass-loader": "14.1.0",
+    "codemirror": "6.65.7",
+    "sweetalert": "2.1.2",
+    "mousetrap": "1.6.5",
+    "create-output-stream": "0.0.1"
+  },
+  "notyet": {
     "archiver": "1.2.x",
-    "clean-webpack-plugin": "0.1.x",
-    "codemirror": "5.21.x",
-    "css-loader": "0.14.x",
-    "extract-text-webpack-plugin": "0.8.x",
+    "clean-webpack-plugin": "3.0.0",
+    "codemirror": "5.61.x",
+    "extract-text-webpack-plugin": "3.0.2",
     "fs-extra": "0.18.x",
     "mousetrap": "1.5.x",
     "node-libs-browser": "^1.0.0",
-    "node-sass": "^4.5.3",
+    "node-sass": "4.14.1",
     "promise": "7.0.x",
-    "sass-loader": "6.0.x",
     "style-loader": "0.18.x",
     "sweetalert": "1.0.x",
-    "webpack": "1.15.x"
+    "graceful-fs": "^4.2.4",
+    "css-loader": "0.14.x",
+    "sass-loader": "6.0.7"
   },
   "scripts": {
     "release": "NODE_ENV=production npm run build",
-    "build": "./node_modules/.bin/webpack --progress --colors && node ./lib/release-script"
-  }
+    "build": "webpack --mode development --progress",
+    "release": "node  --inspect-brk --stack-size=10000 ./lib/release-script",
+    "apreinstall": "npx npm-force-resolutions"
+  },
+    "resolutions": {
+        "graceful-fs": "^4.2.4"
+    },
+    "devDependencies": {}
 }
