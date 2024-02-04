@@ -6,7 +6,10 @@
 
 Extended from tulios/json-viewer. (https://github.com/tulios/json-viewer)
 
-Chrome extension for highlighting JSON/JSONP. Allows custom fold definitions and custom queries to summarize folded content.
+Chrome extension for highlighting JSON/JSONP. 
+
+Allows custom fold definitions and custom queries to summarize folded content. Also recursively interprets
+strings that encode JSON objects.
 
 Notes:
 

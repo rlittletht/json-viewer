@@ -76,7 +76,8 @@ function highlightContent(pre, outsideViewer, ignoreLimit)
     getOptions().then(
         function(options)
         {
-            if (!ignoreLimit && oversizedJSON(pre, options, outsideViewer)) return pre.hidden = false;
+            if (!ignoreLimit && oversizedJSON(pre, options, outsideViewer))
+                return pre.hidden = false;
 
             return contentExtractor(pre, options).then(
                 function(value)
@@ -88,7 +89,8 @@ function highlightContent(pre, outsideViewer, ignoreLimit)
                     var formatted = prependHeader(options, outsideViewer, value.jsonText);
                     var highlighter = new Highlighter(formatted, options);
 
-                    if (options.addons.autoHighlight) highlighter.highlight();
+                    if (options.addons.autoHighlight)
+                        highlighter.highlight();
                     else
                     {
                         highlighter.highlight();
@@ -103,8 +105,9 @@ function highlightContent(pre, outsideViewer, ignoreLimit)
                         )
                     }
 
-                    if (!!options.addons.alwaysFold || options.addons.autoFoldUntilLevel !== undefined || options.addons.prefoldKeys !== undefined || !!options.addons.alwaysFoldOnlyTopLevel)
-                        highlighter.fold(!!options.addons.alwaysFoldOnlyTopLevel, options.addons.autoFoldUntilLevel, options.addons.prefoldKeys);
+                    //if (!!options.addons.alwaysFold || options.addons.autoFoldLevels !== undefined || options.addons.prefoldKeys !== undefined || !!options.addons.alwaysFoldOnlyTopLevel)
+                        highlighter.fold(options.addons.alwaysFold ?? false, options.addons.autoFoldLevels ?? 0, options.addons.prefoldKeys ?? []);
+//                            !options.addons.alwaysFoldOnlyTopLevel, options.addons.autoFoldLevels, options.addons.prefoldKeys);
 
                     exposeJson(value.jsonExtracted, outsideViewer);
                     renderExtras(pre, options, highlighter);
@@ -113,7 +116,8 @@ function highlightContent(pre, outsideViewer, ignoreLimit)
         function(e)
         {
             pre.hidden = false;
-            if (process.env.NODE_ENV === 'development') console.error('[JSONViewer] error: ' + e.message, e);
+            if (process.env.NODE_ENV === 'development')
+                console.error('[JSONViewer] error: ' + e.message, e);
         });
 }
 

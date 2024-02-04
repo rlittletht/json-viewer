@@ -177,7 +177,7 @@ Highlighter.prototype = {
         }
     },
 
-    fold: function(fOnlyLevel2, autoFoldUntilLevel, prefoldKeys)
+    fold: function (alwaysFold, autoFoldLevels, prefoldKeys)
     {
         var firstLine = this.editor.firstLine();
         var lastLine = this.editor.lastLine();
@@ -185,47 +185,51 @@ Highlighter.prototype = {
         var lineCurrent = this.skipRoot(firstLine, lastLine);
 
         // first make a pass through and prefold keys
-        if (prefoldKeys !== undefined)
+        if (prefoldKeys.length > 0)
             this.prefoldKeys(lineCurrent, lastLine, prefoldKeys);
 
-        if (fOnlyLevel2)
+        if (autoFoldLevels > 0)
         {
-            while (lineCurrent < lastLine)
-            {
-                var marks = this.editor.findMarks({ line: lineCurrent, ch: 0 }, { line: lastLine + 1, ch: 0 });
-
-                var skipToLine = 0;
-
-                // look for any folded regions, skip them and continue
-                for (var iMark in marks)
-                {
-                    var mark = marks[iMark]
-                    if (mark.__isFold)
-                    {
-                        skipToLine = lineCurrent + mark.lines.length - 1;
-                        break;
-                    }
-                }
-                if (skipToLine != 0)
-                {
-                    lineCurrent = skipToLine;
-                    continue;
-                }
-                this.editor.foldCode({ line: lineCurrent, ch: 0 }, null, "fold");
-                lineCurrent++;
-            }
+            this.foldLevels(lineCurrent, lastLine, autoFoldLevels);
+            lineCurrent = this.advanceSkippingPastFoldedLines(lineCurrent, lastLine);
             return;
         }
 
-        if (autoFoldUntilLevel !== undefined)
+//        if (fOnlyLevel2)
+//        {
+//            while (lineCurrent < lastLine)
+//            {
+//                var marks = this.editor.findMarks({ line: lineCurrent, ch: 0 }, { line: lastLine + 1, ch: 0 });
+//
+//                var skipToLine = 0;
+//
+//                // look for any folded regions, skip them and continue
+//                for (var iMark in marks)
+//                {
+//                    var mark = marks[iMark]
+//                    if (mark.__isFold)
+//                    {
+//                        skipToLine = lineCurrent + mark.lines.length - 1;
+//                        break;
+//                    }
+//                }
+//                if (skipToLine != 0)
+//                {
+//                    lineCurrent = skipToLine;
+//                    continue;
+//                }
+//                this.editor.foldCode({ line: lineCurrent, ch: 0 }, null, "fold");
+//                lineCurrent++;
+//            }
+//            return;
+        //        }
+        if (alwaysFold)
         {
-            this.foldLevels(lineCurrent, lastLine, autoFoldUntilLevel);
-            lineCurrent = this.advanceSkippingPastFoldedLines(lineCurrent, lastLine);
-        }
-        while (lineCurrent <= lastLine)
-        {
-            this.editor.foldCode({ line: lineCurrent, ch: 0 }, null, "fold");
-            lineCurrent++;
+            while (lineCurrent <= lastLine)
+            {
+                this.editor.foldCode({ line: lineCurrent, ch: 0 }, null, "fold");
+                lineCurrent++;
+            }
         }
     },
 
