@@ -38,7 +38,7 @@ function loadCSS(opts) {
 
       } else {
         attempts++;
-        scheduleId = setTimeout(scheduleCheck, 1);
+        scheduleId = setTimeout(scheduleCheck, 10);
       }
     }
 
