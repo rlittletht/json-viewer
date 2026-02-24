@@ -40,7 +40,7 @@ module.exports =
     {
         keyToMatch: "type",
         valueToMatch: 2,
-        keysToExtract: ["pos1", "pos2", "props"],
+        keysToExtract: ["pos1", "pos2", "props", "adjust"],
         extractLabel: "annot",
         continueAfterMatch: true
     },
@@ -100,6 +100,21 @@ module.exports =
                 recurseDefinition:
                 {
                     keyToSummarize: "props",
+                    summarizeEntryCount: 1
+                }
+            }
+        ]
+    },
+    {
+        keyToMatch: "contents",
+        keyToRecurse: "content",
+        recurseDefinitions:
+        [
+            {
+                keyToMatch: "contents",
+                recurseDefinition:
+                {
+                    keyToSummarize: "adjust",
                     summarizeEntryCount: 1
                 }
             }
